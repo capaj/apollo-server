@@ -336,6 +336,40 @@ describe('apollo-server-express', () => {
       });
     });
 
+    // it('accepts httpQueryResolver configuration', async () => {
+    //   const serverOptions = {
+    //     typeDefs,
+    //     resolvers,
+    //   };
+
+    //   server = new ApolloServer(serverOptions);
+    //   app = express();
+
+    //   server.applyMiddleware({
+    //     app,
+    //     httpQueryResolver: () => {
+    //       return (req, res, next) => {};
+    //     },
+    //   });
+
+    //   httpServer = await new Promise<http.Server>(resolve => {
+    //     const l = app.listen({ port }, () => resolve(l));
+    //   });
+
+    //   const apolloFetch = createApolloFetch({ uri });
+
+    //   return new Promise((resolve, reject) => {
+    //     apolloFetch({ query: '{hello}' })
+    //       .then(reject)
+    //       .catch(error => {
+    //         expect(error.response).toBeDefined();
+    //         expect(error.response.status).toEqual(413);
+    //         expect(error.toString()).toMatch('Payload Too Large');
+    //         resolve();
+    //       });
+    //   });
+    // });
+
     describe('healthchecks', () => {
       afterEach(async () => {
         await server.stop();

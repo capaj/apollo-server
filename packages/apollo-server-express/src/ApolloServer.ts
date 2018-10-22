@@ -14,7 +14,7 @@ import {
 import accepts from 'accepts';
 import typeis from 'type-is';
 
-import { graphqlExpress } from './expressApollo';
+import { graphqlExpress, ExpressGraphQLOptionsFunction } from './expressApollo';
 
 import { processRequest as processFileUploads } from '@apollographql/apollo-upload-server';
 
@@ -32,6 +32,9 @@ export interface ServerRegistration {
   cors?: corsMiddleware.CorsOptions | boolean;
   bodyParserConfig?: OptionsJson | boolean;
   onHealthCheck?: (req: express.Request) => Promise<any>;
+  httpQueryResolver?: (
+    options: GraphQLOptions | ExpressGraphQLOptionsFunction,
+  ) => express.Handler;
   disableHealthCheck?: boolean;
 }
 
@@ -91,6 +94,7 @@ export class ApolloServer extends ApolloServerBase {
     bodyParserConfig,
     disableHealthCheck,
     onHealthCheck,
+    httpQueryResolver,
   }: ServerRegistration) {
     if (!path) path = '/graphql';
 
@@ -140,6 +144,8 @@ export class ApolloServer extends ApolloServerBase {
       app.use(path, uploadsMiddleware);
     }
 
+    const gqlResolver = httpQueryResolver || graphqlExpress;
+
     // Note: if you enable playground in production and expect to be able to see your
     // schema, you'll need to manually specify `introspection: true` in the
     // ApolloServer constructor; by default, the introspection query is only
@@ -169,7 +175,7 @@ export class ApolloServer extends ApolloServerBase {
           return;
         }
       }
-      return graphqlExpress(this.createGraphQLServerOptions.bind(this))(
+      return gqlResolver(this.createGraphQLServerOptions.bind(this))(
         req,
         res,
         next,
